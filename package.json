@@ -21,6 +21,8 @@
     "ejs": "^2.4.2",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
+    "js-data": "^2.9.0",
+    "js-data-http": "^2.2.2",
     "moment": "^2.8.2",
     "node-quickbooks": "^2.0.8",
     "node-uuid": "^1.4.1",

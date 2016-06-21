@@ -2,7 +2,7 @@ var http = require('http'),
   express = require('express'),
   app = express(),
   port = process.env.PORT || 8080
-request = require('request'),
+  request = require('request'),
   bodyParser = require('body-parser'),
   qs = require('querystring'),
   util = require('util'),
@@ -10,10 +10,9 @@ request = require('request'),
   session = require('express-session'),
   QuickBooks = require('./index'),
   config = require('config-json'),
-  // captchaUrl = 'https://www.google.com/recaptcha/api/siteverify?secret=6LeWCCETAAAAAGtTk0MKqtHyPEyNZtfRpqND-uV1&response='
-
+  
   // GENERIC EXPRESS CONFIG
-  app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/public'))
 app.set('port', port)
 app.set('views', 'views')
 app.use(bodyParser.json())
@@ -48,7 +47,7 @@ function QBO(req, res, consumerKey, consumerSecret) {
   request.post(postBody, function (e, r, data) {
     var requestToken = qs.parse(data)
     req.session.oauth_token_secret = requestToken.oauth_token_secret
-    console.log(requestToken)
+    // console.log(requestToken)
     res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
   })
 }
@@ -67,8 +66,8 @@ app.get('/callback', function (req, res) {
   }
   request.post(postBody, function (e, r, data) {
     var accessToken = qs.parse(data)
-    console.log(accessToken)
-    console.log(postBody.oauth.realmId)
+    // console.log(accessToken)
+    // console.log(postBody.oauth.realmId)
 
     // save the access token somewhere on behalf of the logged in user
     qbo = new QuickBooks(consumerKey,
@@ -79,13 +78,14 @@ app.get('/callback', function (req, res) {
       true, // use the Sandbox
       true) // turn debugging on
 
-    // test out account access
-    qbo.findAccounts(function (_, accounts) {
-      accounts.QueryResponse.Account.forEach(function (account) {
-        console.log('QBO is Ready')
-      })
-      res.redirect('/ready')
-    })
+    // // test out account access
+    // qbo.findAccounts(function (_, accounts) {
+    //   accounts.QueryResponse.Account.forEach(function (account) {
+    //     console.log('QBO is Ready')
+    //   })
+    //   res.redirect('/ready')
+    // })
+
   })
 })
 
@@ -113,8 +113,8 @@ app.get('/ready', function (req, res) {
 function updateCuctomerByPhone(customer, callback) {
 
   var qbo = getQbo();
-  delete customer.captchaResponse
-  delete customer.captchaUrl
+  // delete customer.captchaResponse
+  // delete customer.captchaUrl
 
   qbo.updateCustomer(customer, function (err, customer) {
     if (err) console.log(err)
@@ -137,11 +137,7 @@ function findCustomerByPhone(phone, callback) {
 var _qbo
 function getQbo() {
   if (!_qbo) {
-    _qbo = new QuickBooks(consumerKey,
-      consumerSecret,
-      ot,
-      ots,
-      realmId,
+    _qbo = new QuickBooks(consumerKey, consumerSecret,ot,ots, realmId,
       true, // use the Sandbox
       true) // turn debugging on
   }
@@ -149,34 +145,28 @@ function getQbo() {
 }
 
 // TWILIO PART
-
-
-//require the Twilio module and create a REST client
-
-
 app.post('/sms', function (req, res) {
-
   var TW_SN = "+1" + req.body.PrimaryPhone.FreeFormNumber.replace(/[^\d]/g, ""); // customer number for sms
   var TW_MES = Math.floor(Math.random() * 9000) + 1000;
   client = require('twilio')(ACCOUNT_SID, AUTH_TOKEN);
-  client.sendMessage({
-    to: TW_SN,
-    from: TW_PHONE,
-    body: TW_MES
-  }, function (err, responseData) {
+  client.sendMessage({ to: TW_SN, from: TW_PHONE, body: TW_MES},
+  function (err, responseData) {
     if (!err) {
       console.log(responseData.from);
       console.log(responseData.body);
     }
     res.send({ err: err, response: TW_MES })
   });
-
 })
-
 // END OF TWILIO
 
-// // THE CAPTURE VERIFICATION PART
+app.listen(port, function () {
+  console.log('Express server listening on port ' + app.get('port'))
+})
 
+
+// // THE CAPTURE VERIFICATION PART
+// captchaUrl = 'https://www.google.com/recaptcha/api/siteverify?secret=6LeWCCETAAAAAGtTk0MKqtHyPEyNZtfRpqND-uV1&response='
 // app.post('/', function (req, res) {
 //   checkCaptcha(req.body.captchaResponse, function (response) {
 //     if (response.success) {
@@ -186,7 +176,6 @@ app.post('/sms', function (req, res) {
 //     }
 //   })
 // })
-
 // var checkCaptcha = function (captchaResponse, cb) {
 //   request.get(captchaUrl + captchaResponse, function (err, response, body) {
 //     if (err) {
@@ -196,9 +185,5 @@ app.post('/sms', function (req, res) {
 //     }
 //   })
 // }
-
 // //END OF RECAPTURE
 
-app.listen(port, function () {
-  console.log('Express server listening on port ' + app.get('port'))
-})
