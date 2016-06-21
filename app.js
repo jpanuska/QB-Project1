@@ -22,13 +22,13 @@ app.use(cookieParser('brad'))
 app.use(session({ resave: false, saveUninitialized: false, secret: 'smith' }))
 
 // GENERIC KEYS
-config.load('./secret/qbconfig.json');
+config.load('./dots/qbconfig.json');
 var consumerKey = config.get('consumerKey'),
   consumerSecret = config.get('consumerSecret'),
   ot = config.get('ot'),
   ots = config.get('ots'),
   realmId = config.get('realmId');
-config.load('./secret/twconfig.json');
+config.load('./dots/twconfig.json');
 var ACCOUNT_SID = config.get('AccountSid'),
   AUTH_TOKEN = config.get('authToken'),
   TW_PHONE = config.get('twilioPhone');
