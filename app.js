@@ -125,14 +125,13 @@ function getQbo(id, cb) {
 // })
 
 app.get('/lookup/:cid', function (req, res) {
-  debugger
   findCustomerByPhone(req.params.cid, req.query.phoneNumber, function (customer) {
     res.send(customer)
   })
 })
 
-app.put('/updated', function (req, res) {
-  updateCuctomerByPhone(req.query.cid, req.body, function (customer) {
+app.put('/updated/:cid', function (req, res) {
+  updateCuctomerByPhone(req.params.cid, req.body, function (customer) {
     res.send(200);
   })
 })

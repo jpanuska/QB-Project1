@@ -3,11 +3,9 @@ angular.module('qbhelper').
     service('MemberService', function ($http, $state) {
 
         this.findMemberByPhone = function (phoneNumber) {
-            debugger
-            return $http.get('/lookup/'+$state.params.cid, '&phoneNumber='+ phoneNumber)
+            return $http.get('/lookup/'+$state.params.cid +'?phoneNumber='+ phoneNumber)
         }
         this.updateCustomer = function (customer) {
-            debugger
             return $http.put('/updated/'+ $state.params.cid, customer);
         }
 

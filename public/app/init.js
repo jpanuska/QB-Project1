@@ -6,7 +6,7 @@ angular.module("qbhelper").config(function($stateProvider, $urlRouterProvider){
             
         $stateProvider
                 .state('customer',{
-                    url: "/search/:cid",
+                    url: "/cid/:cid",
                     template: "<customer-component></customer-component>"
                 })
                 .state('user', {
