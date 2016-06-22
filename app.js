@@ -33,22 +33,22 @@ var Users = store.defineResource({
 })
 
 // QUICKBOOKS PART
-function QBO(req, res, consumerKey, consumerSecret) {
-  var postBody = {
-    url: QuickBooks.REQUEST_TOKEN_URL,
-    oauth: {
-      callback: 'http://localhost:' + port + '/callback/',
-      consumer_key: consumerKey,
-      consumer_secret: consumerSecret
-    }
-  }
-  request.post(postBody, function (e, r, data) {
-    var requestToken = qs.parse(data)
-    req.session.oauth_token_secret = requestToken.oauth_token_secret
-    console.log(requestToken)
-    res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
-  })
-}
+// function QBO(req, res, consumerKey, consumerSecret) {
+//   var postBody = {
+//     url: QuickBooks.REQUEST_TOKEN_URL,
+//     oauth: {
+//       callback: 'http://localhost:' + port + '/callback/',
+//       consumer_key: consumerKey,
+//       consumer_secret: consumerSecret
+//     }
+//   }
+//   request.post(postBody, function (e, r, data) {
+//     var requestToken = qs.parse(data)
+//     req.session.oauth_token_secret = requestToken.oauth_token_secret
+//     console.log(requestToken)
+//     res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
+//   })
+// }
 
 
 function updateCuctomerByPhone(id, customer, callback) {
@@ -95,34 +95,34 @@ function getQbo(id, cb) {
   })
 }
 
-app.get('/callback', function (req, res) {
-  var postBody = {
-    url: QuickBooks.ACCESS_TOKEN_URL,
-    oauth: {
-      consumer_key: consumerKey,
-      consumer_secret: consumerSecret,
-      token: req.query.oauth_token,
-      token_secret: req.session.oauth_token_secret,
-      verifier: req.query.oauth_verifier,
-      realmId: req.query.realmId
-    }
-  }
-  request.post(postBody, function (e, r, data) {
-      var accessToken = qs.parse(data)
-      console.log(accessToken)
-      console.log(postBody.oauth.realmId)
+// app.get('/callback', function (req, res) {
+//   var postBody = {
+//     url: QuickBooks.ACCESS_TOKEN_URL,
+//     oauth: {
+//       consumer_key: consumerKey,
+//       consumer_secret: consumerSecret,
+//       token: req.query.oauth_token,
+//       token_secret: req.session.oauth_token_secret,
+//       verifier: req.query.oauth_verifier,
+//       realmId: req.query.realmId
+//     }
+//   }
+//   request.post(postBody, function (e, r, data) {
+//       var accessToken = qs.parse(data)
+//       console.log(accessToken)
+//       console.log(postBody.oauth.realmId)
 
-      // save the access token somewhere on behalf of the logged in user
-      qbo = new QuickBooks(
-            consumerKey,
-            consumerSecret,
-            accessToken.oauth_token,
-            accessToken.oauth_token_secret,
-            postBody.oauth.realmId,
-            true, // use the Sandbox
-            true)
-    })
-})
+//       // save the access token somewhere on behalf of the logged in user
+//       qbo = new QuickBooks(
+//             consumerKey,
+//             consumerSecret,
+//             accessToken.oauth_token,
+//             accessToken.oauth_token_secret,
+//             postBody.oauth.realmId,
+//             true, // use the Sandbox
+//             true)
+//     })
+// })
 
 app.get('/lookup', function (req, res) {
   findCustomerByPhone(req.query.compId, req.query.phoneNumber, function (customer) {
