@@ -86,10 +86,10 @@ function getQbo(id, cb) {
   var compId = id;
   Users.find(compId).then(function (user) {
     var consumerKey = user.consumerKey,
-      consumerSecret = user.consumerSecret,
-      ot = user.ot,
-      ots = user.ots,
-      realmId = user.realmId;
+        consumerSecret = user.consumerSecret,
+        ot = user.ot,
+        ots = user.ots,
+        realmId = user.realmId;
     _qbo = new QuickBooks(consumerKey, consumerSecret, ot, ots, realmId,
       true, // use the Sandbox
       true) // turn debugging on
@@ -133,8 +133,9 @@ app.get('/lookup', function (req, res) {
   })
 })
 
-app.post('/updated', function (req, res) {
-  updateCuctomerByPhone(req.body, function (customer) {
+app.put('/updated', function (req, res) {
+  debugger
+  updateCuctomerByPhone(req.query.compId, req.body, function (customer) {
     res.send(200);
   })
 })

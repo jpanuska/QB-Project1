@@ -6,7 +6,8 @@ angular.module('qbhelper').
             return $http.get('/lookup'+location.search+'&phoneNumber='+phoneNumber)
         }
         this.updateCustomer = function (customer) {
-            return $http.post('/updated', customer);
+            debugger
+            return $http.put('/updated/'+ location.search, customer);
         }
 
         this.sendSMS = function (customer) {
