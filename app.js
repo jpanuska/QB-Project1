@@ -124,14 +124,15 @@ function getQbo(id, cb) {
 //     })
 // })
 
-app.get('/lookup', function (req, res) {
-  findCustomerByPhone(req.query.compId, req.query.phoneNumber, function (customer) {
+app.get('/lookup/:cid', function (req, res) {
+  debugger
+  findCustomerByPhone(req.params.cid, req.query.phoneNumber, function (customer) {
     res.send(customer)
   })
 })
 
 app.put('/updated', function (req, res) {
-  updateCuctomerByPhone(req.query.compId, req.body, function (customer) {
+  updateCuctomerByPhone(req.query.cid, req.body, function (customer) {
     res.send(200);
   })
 })
