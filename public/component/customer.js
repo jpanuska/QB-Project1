@@ -1,5 +1,5 @@
 angular.module('qbhelper').component('customerComponent', {
-    templateUrl: '/component/check.html',
+    templateUrl: '/component/customer.html',
     controllerAs: 'ch',
     controller: function ($state, MemberService, PhoneService) {
 
