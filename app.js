@@ -2,7 +2,7 @@ var http = require('http'),
   express = require('express'),
   app = express(),
   port = process.env.PORT || 8080
-request = require('request'),
+  request = require('request'),
   bodyParser = require('body-parser'),
   qs = require('querystring'),
   util = require('util'),
@@ -32,15 +32,6 @@ var Users = store.defineResource({
   filepath: __dirname + '/dots/users.db'
 })
 
-// GENERIC KEYS
-// config.load('./dots/qbconfig.json');
-// var consumerKey = config.get('consumerKey'),
-//   consumerSecret = config.get('consumerSecret'),
-//   ot = config.get('ot'),
-//   ots = config.get('ots'),
-//   realmId = config.get('realmId');
-
-
 // QUICKBOOKS PART
 function QBO(req, res, consumerKey, consumerSecret) {
   var postBody = {
@@ -54,10 +45,11 @@ function QBO(req, res, consumerKey, consumerSecret) {
   request.post(postBody, function (e, r, data) {
     var requestToken = qs.parse(data)
     req.session.oauth_token_secret = requestToken.oauth_token_secret
-    // console.log(requestToken)
+    console.log(requestToken)
     res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
   })
 }
+
 
 function updateCuctomerByPhone(id, customer, callback) {
   getQbo(id, function (qbo) {
@@ -87,12 +79,14 @@ function getQbo(id, cb) {
   Users.find(compId).then(function (user) {
     var consumerKey = user.consumerKey,
         consumerSecret = user.consumerSecret,
-        ot = user.ot,
-        ots = user.ots,
-        realmId = user.realmId;
-    _qbo = new QuickBooks(consumerKey, consumerSecret, ot, ots, realmId,
-      true, // use the Sandbox
-      true) // turn debugging on
+    _qbo = new QuickBooks(
+            consumerKey, 
+            consumerSecret, 
+            accessToken.oauth_token,
+            accessToken.oauth_token_secret,
+            postBody.oauth.realmId,
+            true, // use the Sandbox
+            true) // turn debugging on
     cb(_qbo)
   })
 }
@@ -109,22 +103,21 @@ app.get('/callback', function (req, res) {
       realmId: req.query.realmId
     }
   }
+  request.post(postBody, function (e, r, data) {
+      var accessToken = qs.parse(data)
+      console.log(accessToken)
+      console.log(postBody.oauth.realmId)
 
-request.post(postBody, function (e, r, data) {
-    var accessToken = qs.parse(data)
-    // console.log(accessToken)
-    // console.log(postBody.oauth.realmId)
-
-    // save the access token somewhere on behalf of the logged in user
-    qbo = new QuickBooks(
-      consumerKey,
-      consumerSecret,
-      accessToken.oauth_token,
-      accessToken.oauth_token_secret,
-      postBody.oauth.realmId,
-      true, // use the Sandbox
-      true) // turn debugging on
-  })
+      // save the access token somewhere on behalf of the logged in user
+      qbo = new QuickBooks(
+            consumerKey,
+            consumerSecret,
+            accessToken.oauth_token,
+            accessToken.oauth_token_secret,
+            postBody.oauth.realmId,
+            true, // use the Sandbox
+            true)
+    })
 })
 
 app.get('/lookup', function (req, res) {
@@ -134,24 +127,14 @@ app.get('/lookup', function (req, res) {
 })
 
 app.put('/updated', function (req, res) {
-  debugger
   updateCuctomerByPhone(req.query.compId, req.body, function (customer) {
     res.send(200);
   })
 })
 
-// app.get('/start', function (req, res) {
-//   console.log('authenticating connection, please wait.....')
-//   QBO(req, res, consumerKey, consumerSecret)
-// })
-
 app.get('/ready', function (req, res) {
   res.sendFile(__dirname + '/public/index.html')
 })
-
-
-
-
 
 // TWILIO PART
 config.load('./dots/twconfig.json');
