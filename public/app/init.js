@@ -1,14 +1,16 @@
 (function(){
-angular.module("qbhelper",['ui.router']);
+angular.module("qbhelper",['ui.router']);})();
+
+
 angular.module("qbhelper").config(function($stateProvider){
             
         $stateProvider
-                .state('home',{
-                    url: "",
+                .state('customer',{
+                    url: "/",
                     template: "<customer-component></customer-component>"
                 })
-                .state('books', {
-                    url: '/admin',
+                .state('user', {
+                    url: '/user',
                     template: '<user-component></user-component>'
                 })
-})}());
+});
