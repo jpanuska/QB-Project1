@@ -79,12 +79,16 @@ function getQbo(id, cb) {
   Users.find(compId).then(function (user) {
     var consumerKey = user.consumerKey,
         consumerSecret = user.consumerSecret,
+        token = user.ot,
+        token_secret = user.ots,
+        realmId = user.realmId;
+
     _qbo = new QuickBooks(
             consumerKey, 
             consumerSecret, 
-            accessToken.oauth_token,
-            accessToken.oauth_token_secret,
-            postBody.oauth.realmId,
+            token,
+            token_secret,
+            realmId,
             true, // use the Sandbox
             true) // turn debugging on
     cb(_qbo)
