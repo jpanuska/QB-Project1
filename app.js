@@ -129,9 +129,16 @@ app.put('/updated/:cid', function (req, res) {
   })
 })
 
-app.get('/ready', function (req, res) {
-  res.sendFile(__dirname + '/public/index.html')
+
+app.post('/link', function(req, res){
+
+  var link = "";
+  res.send(link)
 })
+
+// app.get('/ready', function (req, res) {
+//   res.sendFile(__dirname + '/public/index.html')
+// })
 
 // TWILIO PART
 config.load('./dots/twconfig.json');

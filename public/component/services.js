@@ -18,6 +18,7 @@ angular.module('qbhelper').
 
         this.createLink = function(user){
             console.log(user);
+            return $http.post('/link', user)
         }
     })
 
