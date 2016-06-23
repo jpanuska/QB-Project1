@@ -130,12 +130,6 @@ app.put('/updated/:cid', function (req, res) {
 })
 
 
-app.post('/link', function(req, res){
-
-  var link = "";
-  res.send(link)
-})
-
 // app.get('/ready', function (req, res) {
 //   res.sendFile(__dirname + '/public/index.html')
 // })
@@ -162,8 +156,17 @@ app.post('/sms', function (req, res) {
 
 
 //ADMIN PART
-app.post('/users', function (req, res) {
-  Users.create(req.body.user).then(function (user) {
+app.post('/link', function (req, res) {
+  debugger
+  var user = {
+    id = uuid.v4(),
+    company = req.body.name,
+    consumerKey = req.body.ck,
+    consumerSecret = req.body.cs,
+    email = req.body.email
+  }
+  
+  Users.create(user).then(function (user) {
     res.send({ message: `Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id })
   })
 })
