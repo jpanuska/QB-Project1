@@ -12,6 +12,7 @@ angular.module('qbhelper').component('userComponent', {
         }
         vm.createUser = function(newUser) {
             UserService.createLink(newUser).then(handleSuccess, handleError);
+            ch.newUser = {};
         }
 
         function handleSuccess(res) {
