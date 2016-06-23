@@ -1,5 +1,57 @@
-<div class="container">
-    <div class="jumbotron">
-        <h1>Welcome to Admin page</h1>
+<div class="container-fluid">
+
+    <!-- Asking for QB ID and password-->
+
+    <div class="jumbotron jumbotron-primary text-center" ng-show="vm.checked == false">
+        <!--<div ng-show="vm.vform == 1">-->
+        <h1>Welcome to Customer Updater!</h1>
+        <div class="col-md-8 col-md-offset-2">
+        <form ng-submit="vm.find(vm.user)">
+                <h3>Please enter your Quickbooks information below: </h3>
+                <div class="input-group-lg col-md-5">
+                    <input placeholder="Your Quickbooks ID" type="text" class="form-control" ng-model="vm.user.qbid" required />
+                </div>
+                <div class="input-group-lg col-md-5">
+                    <input placeholder="Your Quickbooks password" type="password" class="form-control" ng-model="vm.user.qbpw" required/>
+                </div>
+                <div class="btn-group btn-group-lg">
+                    <button class="btn btnqb" type="submit"> Sing in</button>
+                </div>
+        </div>
+        </form>
     </div>
+</div>
+</div>
+
+<!-- User form-->
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-12" ng-show="vm.checked == true">
+        <div class="panel" style="margin-top: 3%">
+            <div class="panel-heading">
+                <h1>QuickBooks Customer Updater</h1>
+                <hr></hr>
+                <h2>Provide your information to create a new link:</h2>
+            </div>
+            <div class="panel-body">
+                <form class="form" ng-submit="vm.createUser(vm.newUser)">
+                    <div class="form-group col-md-12 col-xs-12">
+                        <label for="name">Company Name</label>
+                        <input placeholder="Please provide your company name" type="text" class="form-control" ng-model="vm.newUser.name" required>
+                        <label for="name">Company Consumer Key</label>
+                        <input placeholder="Please provide your cunsumer key" type="text" class="form-control" ng-model="vm.newUser.ck" required>
+                        <label for="name">Company Consumer Secret</label>
+                        <input placeholder="Please provide your consumer secret" type="text" class="form-control" ng-model="vm.newUser.cs" required>
+                        <label for="name">E-mail</label>
+                        <input placeholder="Please provide contact e-mail" type="email" class="form-control" ng-model="vm.newUser.email" required>
+                        <div class="col-md-6 col-md-offset-3 col-xs-12">
+                            <button type="submit" class="btn btnqb pull-right" style="width: 100%">CREATE</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>

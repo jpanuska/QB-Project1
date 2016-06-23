@@ -14,6 +14,13 @@ angular.module('qbhelper').
         }
     })
 
+    service('UserService', function($http, $state){
+
+        this.createLink = function(user){
+            console.log(user);
+        }
+    })
+
     .service('PhoneService', function () {
 
         this.formatPhoneNumber = function (tel) {
