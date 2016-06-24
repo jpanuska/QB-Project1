@@ -45,10 +45,19 @@ var postBody = {
         }
 };
     request.post(QuickBooks.REQUEST_TOKEN_URL, postBody, function(err, data) {
-        var requestToken = qs.parse(data.body)
+        var requestToken = qs.parse(data.body);
+            qbo = new QuickBooks(
+                            consumerKey,
+                            consumerSecret,
+                            requestToken.oauth_token,
+                            requestToken.oauth_token_secret,
+                            postBody.oauth.realmId,
+                            true, // use the Sandbox
+                            true); // turn debugging on
         req.session.oauth_token_secret = requestToken.oauth_token_secret
         console.log(requestToken)
-        res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
+        debugger
+        // res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
     })
 
     app.get('/callback', function(req, res) {
@@ -67,17 +76,11 @@ var postBody = {
         var accessToken = qs.parse(data)
         console.log(accessToken)
         console.log(postBody.oauth.realmId)
+      }) 
+    })
 
-        // save the access token somewhere on behalf of the logged in user
-        qbo = new QuickBooks(consumerKey,
-                            consumerSecret,
-                            accessToken.oauth_token,
-                            accessToken.oauth_token_secret,
-                            postBody.oauth.realmId,
-                            true, // use the Sandbox
-                            true); // turn debugging on
-      }) })
-return qbo;
+    console.log("HAve qbo")
+    return qbo;
 }
 
 
@@ -155,8 +158,8 @@ app.post('/sms', function (req, res) {
 
 //ADMIN PART
 app.post('/link', function (req, res) {
-  debugger
 
+  debugger
   var user = {
     id: uuid.v4(),
     company: req.body.name,
