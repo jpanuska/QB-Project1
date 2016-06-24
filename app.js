@@ -11,6 +11,7 @@ var http = require('http'),
   QuickBooks = require('./index'),
   JSData = require('js-data'),
   DSNedbAdapter = require('js-data-nedb'),
+  uuid = require('node-uuid'),
   config = require('config-json');
 
 // GENERIC EXPRESS CONFIG
@@ -33,24 +34,21 @@ var Users = store.defineResource({
 })
 
 // QUICKBOOKS PART
-function QBO (consumerKey, consumerSecret) {
+function QBO (req, res, consumerKey, consumerSecret) {
 var qbo;
-
-    app.get('/requestToken', function(req, res) {
-      var postBody = {
+var postBody = {
         url: QuickBooks.REQUEST_TOKEN_URL,
         oauth: {
           callback:        'http://localhost:' + port + '/callback/',
           consumer_key:    consumerKey,
           consumer_secret: consumerSecret
         }
-      }
-      request.post(postBody, function (e, r, data) {
-        var requestToken = qs.parse(data)
+};
+    request.post(QuickBooks.REQUEST_TOKEN_URL, postBody, function(err, data) {
+        var requestToken = qs.parse(data.body)
         req.session.oauth_token_secret = requestToken.oauth_token_secret
         console.log(requestToken)
         res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
-      })
     })
 
     app.get('/callback', function(req, res) {
@@ -94,8 +92,8 @@ function updateCuctomerByPhone(id, customer, callback) {
   })
 }
 
-function findCustomerByPhone(id, phone, callback) {
-  getQbo(id, function (qbo) {
+function findCustomerByPhone(req, res, id, phone, callback) {
+  getQbo(req,res, id, function (qbo) {
     qbo.findCustomers([
       { field: 'fetchAll', value: true },
     ], function (e, res) {
@@ -105,12 +103,12 @@ function findCustomerByPhone(id, phone, callback) {
   })
 }
 
-function getQbo(id, cb) {
+function getQbo(req, res, id, cb) {
   var compId = id;
   Users.find(compId).then(function (user) {
     var consumerKey = user.consumerKey,
         consumerSecret = user.consumerSecret;
-  var qbo = QBO(consumerKey, consumerSecret);
+  var qbo = QBO(req, res, consumerKey, consumerSecret);
     cb(qbo)
   })
 }
@@ -118,7 +116,7 @@ function getQbo(id, cb) {
 
 
 app.get('/lookup/:cid', function (req, res) {
-  findCustomerByPhone(req.params.cid, req.query.phoneNumber, function (customer) {
+  findCustomerByPhone(req, res, req.params.cid, req.query.phoneNumber, function (customer) {
     res.send(customer)
   })
 })
@@ -158,18 +156,19 @@ app.post('/sms', function (req, res) {
 //ADMIN PART
 app.post('/link', function (req, res) {
   debugger
+
   var user = {
-    id = uuid.v4(),
-    company = req.body.name,
-    consumerKey = req.body.ck,
-    consumerSecret = req.body.cs,
-    email = req.body.email
+    id: uuid.v4(),
+    company: req.body.name,
+    consumerKey: req.body.ck,
+    consumerSecret: req.body.cs,
+    email: req.body.email
   }
-  
-  Users.create(user).then(function (user) {
+
+  // Users.create(user).then(function (user) {
     res.send({ message: `Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id })
-  })
-})
+  // })
+});
 
 
 app.listen(port, function () {

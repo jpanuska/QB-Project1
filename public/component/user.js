@@ -5,6 +5,7 @@ angular.module('qbhelper').component('userComponent', {
 
         var vm = this;
         vm.checked = false;
+        vm.form = false;
 
         vm.find = function(user) {
         // CHECK THE USER
@@ -17,9 +18,11 @@ angular.module('qbhelper').component('userComponent', {
 
         function handleSuccess(res) {
             if (res.data) {
-                ch.link = res.data;
+                vm.checked = false;
+                vm.form = true;
+                vm.link = res.data;
             } else {
-                ch.link = "Sorry, but there is some error.";
+                vm.link = "Sorry, but there is some error.";
             }
         }
         function handleError(err) {

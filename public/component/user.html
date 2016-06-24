@@ -3,7 +3,8 @@
     <!-- Asking for QB ID and password-->
 
     <div class="jumbotron jumbotron-primary text-center" ng-show="vm.checked == false">
-        <!--<div ng-show="vm.vform == 1">-->
+
+        <div ng-show="vm.form == false">
         <h1>Welcome to Customer Updater!</h1>
         <div class="col-md-8 col-md-offset-2">
         <form ng-submit="vm.find(vm.user)">
@@ -18,6 +19,14 @@
                     <button class="btn btnqb" type="submit"> Sing in</button>
                 </div>
         </form>
+        </div>
+        </div>
+
+        <div ng-show="vm.form == true">
+            <h1>Welcome to Customer Updater!</h1>
+            <div class="col-md-8 col-md-offset-2">
+                <h3>{{vm.link}}</h3>
+            </div>
         </div>
     </div>
 
