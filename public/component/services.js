@@ -15,29 +15,16 @@ angular.module('qbhelper').
         }
     })
 
-    .service('RecaptchaService', function ($http) {
-        return {
-            sendForm: function (item) {
-                return $http({
-                    method: 'POST',
-                    url: '/',
-                    data: item
-                });
-            }
-        }
-    })
-
     .service('PhoneService', function () {
 
         this.formatPhoneNumber = function (tel) {
             if(!tel){
                 return
-            }
+            };
             var value = tel.toString().trim().replace(/^\+/, '');
             if (value.match(/[^0-9]/)) {
                 return tel;
-            }
-
+            };
             var country, city, number;
             switch (value.length) {
                 case 10: // +1PPP####### -> C (PPP) ###-####

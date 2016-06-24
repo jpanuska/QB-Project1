@@ -1,16 +1,16 @@
 var http = require('http'),
-  express = require('express'),
-  app = express(),
-  port = process.env.PORT || 8080
-  request = require('request'),
-  bodyParser = require('body-parser'),
-  qs = require('querystring'),
-  util = require('util'),
-  cookieParser = require('cookie-parser'),
-  session = require('express-session'),
-  QuickBooks = require('./index'),
-  config = require('config-json'),
-  
+    express = require('express'),
+    app = express(),
+    port = process.env.PORT || 8080
+    request = require('request'),
+    bodyParser = require('body-parser'),
+    qs = require('querystring'),
+    util = require('util'),
+    cookieParser = require('cookie-parser'),
+    session = require('express-session'),
+    QuickBooks = require('./index'),
+    config = require('config-json');
+
   // GENERIC EXPRESS CONFIG
 app.use(express.static(__dirname + '/public'))
 app.set('port', port)
@@ -32,9 +32,7 @@ var ACCOUNT_SID = config.get('AccountSid'),
   AUTH_TOKEN = config.get('authToken'),
   TW_PHONE = config.get('twilioPhone');
 
-
-
-
+// QUICKBOOKS PART
 function QBO(req, res, consumerKey, consumerSecret) {
   var postBody = {
     url: QuickBooks.REQUEST_TOKEN_URL,
@@ -77,24 +75,16 @@ app.get('/callback', function (req, res) {
       postBody.oauth.realmId,
       true, // use the Sandbox
       true) // turn debugging on
-
-    // // test out account access
-    // qbo.findAccounts(function (_, accounts) {
-    //   accounts.QueryResponse.Account.forEach(function (account) {
-    //     console.log('QBO is Ready')
-    //   })
-    //   res.redirect('/ready')
-    // })
-
   })
 })
 
+// FIND CUSTOMER BY PHONE
 app.get('/lookup', function (req, res) {
   findCustomerByPhone(req.query.phoneNumber, function (customer) {
     res.send(customer)
   })
 })
-
+// UPDATE CUSTOMER
 app.post('/updated', function (req, res) {
   updateCuctomerByPhone(req.body, function (customer) {
     res.send(200);
@@ -111,11 +101,7 @@ app.get('/ready', function (req, res) {
 })
 
 function updateCuctomerByPhone(customer, callback) {
-
   var qbo = getQbo();
-  // delete customer.captchaResponse
-  // delete customer.captchaUrl
-
   qbo.updateCustomer(customer, function (err, customer) {
     if (err) console.log(err)
     if (callback && typeof callback == 'function') {
@@ -129,7 +115,7 @@ function findCustomerByPhone(phone, callback) {
   qbo.findCustomers([
     { field: 'fetchAll', value: true },
   ], function (e, res) {
-    var customer = res.QueryResponse.Customer.find(x => x.PrimaryPhone && x.PrimaryPhone.FreeFormNumber == phone);
+    var customer = res.QueryResponse.Customer.find(x => x.PrimaryPhone && x.PrimaryPhone.FreeFormNumber.replace(/[^\d]/g, "") == phone.replace(/[^\d]/g, ""));
     callback(customer);
   })
 }
@@ -158,32 +144,10 @@ app.post('/sms', function (req, res) {
     res.send({ err: err, response: TW_MES })
   });
 })
-// END OF TWILIO
 
+
+// LISTENING PORT
 app.listen(port, function () {
   console.log('Express server listening on port ' + app.get('port'))
 })
-
-
-// // THE CAPTURE VERIFICATION PART
-// captchaUrl = 'https://www.google.com/recaptcha/api/siteverify?secret=6LeWCCETAAAAAGtTk0MKqtHyPEyNZtfRpqND-uV1&response='
-// app.post('/', function (req, res) {
-//   checkCaptcha(req.body.captchaResponse, function (response) {
-//     if (response.success) {
-//       res.send('WOOT! you are not a robot')
-//     } else {
-//       res.send('BAD! you are a robot')
-//     }
-//   })
-// })
-// var checkCaptcha = function (captchaResponse, cb) {
-//   request.get(captchaUrl + captchaResponse, function (err, response, body) {
-//     if (err) {
-//       console.log('error: ', err)
-//     } else {
-//       return cb(JSON.parse(body))
-//     }
-//   })
-// }
-// //END OF RECAPTURE
 

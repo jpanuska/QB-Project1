@@ -1,9 +1,7 @@
-
-
 angular.module('qbhelper').component('customerComponent', {
     templateUrl: '/component/check.html',
     controllerAs: 'ch',
-    controller: function ($scope, $state, MemberService, PhoneService, RecaptchaService) {
+    controller: function ($state, MemberService, PhoneService) {
 
         var ch = this;
         ch.checked = false;
@@ -17,26 +15,15 @@ angular.module('qbhelper').component('customerComponent', {
                 ch.currentCustomer.PrimaryPhone.FreeFormNumber = formatted
             }
         }
-
-        // TODO normolize the phone number
-        // find the phone number in QB SQL
+        // FIND CUSTOMER BY PHONE
         ch.find = function (phoneNumber) {
-            var normalNumber = phoneNumber;//.replace (/[^\d]/g, "");
-            MemberService.findMemberByPhone(normalNumber).then(handleServerSuccess, handleServerError);
+            MemberService.findMemberByPhone(phoneNumber).then(handleServerSuccess, handleServerError);
         };
 
         // UPDATING THE CUSTOMER INFORMATION
         ch.updateCustomer = function (updatedCustomer) {
-            // if (grecaptcha.getResponse()) {
-            //     updatedCustomer.captchaResponse = grecaptcha.getResponse();
-            //     RecaptchaService.sendForm().then(function (response) {
-            //         window.response = response.data;
             MemberService.updateCustomer(updatedCustomer).then(handleUpdateSuccess, handleServerError);
             ch.currentCustomer = {};
-            //     });
-            // } else {
-            //     $('#serverError').modal('show');
-            // }
         }
 
         // SEND SMS FOR PHONE VERIFICATION
@@ -48,14 +35,13 @@ angular.module('qbhelper').component('customerComponent', {
             ch.message = message;
             $('#showMessage').modal('show');
         }
-
         //PROFILE IS UPDATED
         function handleUpdateSuccess(res) {
             console.log(" Update success");
             ch.checked = false;
             ch.vform = 3;
         }
-
+        // CHECK RESPONCE AFTER FIDING CUSTOMER BY PHONE
         function handleServerSuccess(res) {
             if (res.data) {
                 ch.currentCustomer = res.data;
@@ -65,7 +51,7 @@ angular.module('qbhelper').component('customerComponent', {
                 showMessage("Sorry, but we do not know this phone number. Please, try again..");
             }
         }
-
+        // CHECK RESPONCE AFTER SENDING SMS
         function CodeSuccess(res) {
             console.log('CODE SENT');
             ch.vform = 2;
@@ -79,7 +65,7 @@ angular.module('qbhelper').component('customerComponent', {
                 }
             };
         }
-
+        // CHECK SERVER ERRORS
         function handleServerError(err) {
             console.log("SERVER ERROR ");
             showMessage("Sorry, but there is some error. Please, try again..");
