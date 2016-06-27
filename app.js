@@ -45,8 +45,8 @@ function updateCuctomerByPhone(id, customer, callback) {
   })
 }
 
-function findCustomerByPhone(req, res, id, phone, callback) {
-  getQbo(req,res, id, function (qbo) {
+function findCustomerByPhone(id, phone, callback) {
+  getQbo(id, function (qbo) {
     qbo.findCustomers([
       { field: 'fetchAll', value: true },
     ], function (e, res) {
@@ -56,16 +56,15 @@ function findCustomerByPhone(req, res, id, phone, callback) {
   })
 }
 
-function getQbo(req, res, id, cb) {
-  var compId = id;
-  Users.find(compId).then(function (user) {
+function getQbo(id, cb) {
+  Users.find(id).then(function (user) {
     var qbo = new QuickBooks(user.ck, user.cs, user.tk, user.ts, user.rid, true, true);
     cb(qbo)
   })
 }
 
 app.get('/lookup/:cid', function (req, res) {
-  findCustomerByPhone(req, res, req.params.cid, req.query.phoneNumber, function (customer) {
+  findCustomerByPhone(req.params.cid, req.query.phoneNumber, function (customer) {
     res.send(customer)
   })
 })
