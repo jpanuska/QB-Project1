@@ -33,6 +33,90 @@ var Users = store.defineResource({
   filepath: __dirname + '/dots/users.db'
 })
 
+// QB HELPER PART
+function updateCuctomerByPhone(id, customer, callback) {
+  getQbo(id, function (qbo) {
+    qbo.updateCustomer(customer, function (err, customer) {
+      if (err) console.log(err)
+      if (callback && typeof callback == 'function') {
+        callback(customer)
+      }
+    })
+  })
+}
+
+function findCustomerByPhone(req, res, id, phone, callback) {
+  getQbo(req,res, id, function (qbo) {
+    qbo.findCustomers([
+      { field: 'fetchAll', value: true },
+    ], function (e, res) {
+      var customer = res.QueryResponse.Customer.find(x => x.PrimaryPhone && x.PrimaryPhone.FreeFormNumber.replace(/[^\d]/g, "") == phone.replace(/[^\d]/g, ""));
+      callback(customer);
+    })
+  })
+}
+
+function getQbo(req, res, id, cb) {
+  var compId = id;
+  Users.find(compId).then(function (user) {
+    var qbo = new QuickBooks(user.ck, user.cs, user.tk, user.ts, user.rid, true, true);
+    cb(qbo)
+  })
+}
+
+app.get('/lookup/:cid', function (req, res) {
+  findCustomerByPhone(req, res, req.params.cid, req.query.phoneNumber, function (customer) {
+    res.send(customer)
+  })
+})
+
+app.put('/updated/:cid', function (req, res) {
+  updateCuctomerByPhone(req.params.cid, req.body, function (customer) {
+    res.send(200);
+  })
+})
+
+// TWILIO PART
+config.load('./dots/twconfig.json');
+var ACCOUNT_SID = config.get('AccountSid'),
+    AUTH_TOKEN = config.get('authToken'),
+    TW_PHONE = config.get('twilioPhone');
+
+app.post('/sms', function (req, res) {
+  var TW_SN = "+1" + req.body.PrimaryPhone.FreeFormNumber.replace(/[^\d]/g, ""); // customer number for sms
+  var TW_MES = Math.floor(Math.random() * 9000) + 1000;
+  client = require('twilio')(ACCOUNT_SID, AUTH_TOKEN);
+  client.sendMessage({ to: TW_SN, from: TW_PHONE, body: TW_MES },
+    function (err, responseData) {
+      if (!err) {
+        console.log(responseData.from);
+        console.log(responseData.body);
+      }
+      res.send({ err: err, response: TW_MES })
+    });
+})
+
+
+//ADMIN PART
+app.post('/link', function (req, res) {
+
+  debugger
+  var user = {
+    id: uuid.v4(),
+    cn: req.body.name, // company name
+    ck: req.body.ck, // consumer_key
+    cs: req.body.cs, //consumer_secret
+    tk: some,//token
+    ts: some,// token_secret
+    rid: some, // realmId
+    em: req.body.email // company email
+  }
+
+  // Users.create(user).then(function (user) {
+    res.send({ message: `Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id })
+  // })
+});
+
 // QUICKBOOKS PART
 function QBO (req, res, consumerKey, consumerSecret) {
 var qbo;
@@ -82,96 +166,6 @@ var postBody = {
     console.log("HAve qbo")
     return qbo;
 }
-
-
-function updateCuctomerByPhone(id, customer, callback) {
-  getQbo(id, function (qbo) {
-    qbo.updateCustomer(customer, function (err, customer) {
-      if (err) console.log(err)
-      if (callback && typeof callback == 'function') {
-        callback(customer)
-      }
-    })
-  })
-}
-
-function findCustomerByPhone(req, res, id, phone, callback) {
-  getQbo(req,res, id, function (qbo) {
-    qbo.findCustomers([
-      { field: 'fetchAll', value: true },
-    ], function (e, res) {
-      var customer = res.QueryResponse.Customer.find(x => x.PrimaryPhone && x.PrimaryPhone.FreeFormNumber.replace(/[^\d]/g, "") == phone.replace(/[^\d]/g, ""));
-      callback(customer);
-    })
-  })
-}
-
-function getQbo(req, res, id, cb) {
-  var compId = id;
-  Users.find(compId).then(function (user) {
-    var consumerKey = user.consumerKey,
-        consumerSecret = user.consumerSecret;
-  var qbo = QBO(req, res, consumerKey, consumerSecret);
-    cb(qbo)
-  })
-}
-
-
-
-app.get('/lookup/:cid', function (req, res) {
-  findCustomerByPhone(req, res, req.params.cid, req.query.phoneNumber, function (customer) {
-    res.send(customer)
-  })
-})
-
-app.put('/updated/:cid', function (req, res) {
-  updateCuctomerByPhone(req.params.cid, req.body, function (customer) {
-    res.send(200);
-  })
-})
-
-
-// app.get('/ready', function (req, res) {
-//   res.sendFile(__dirname + '/public/index.html')
-// })
-
-// TWILIO PART
-config.load('./dots/twconfig.json');
-var ACCOUNT_SID = config.get('AccountSid'),
-  AUTH_TOKEN = config.get('authToken'),
-  TW_PHONE = config.get('twilioPhone');
-
-app.post('/sms', function (req, res) {
-  var TW_SN = "+1" + req.body.PrimaryPhone.FreeFormNumber.replace(/[^\d]/g, ""); // customer number for sms
-  var TW_MES = Math.floor(Math.random() * 9000) + 1000;
-  client = require('twilio')(ACCOUNT_SID, AUTH_TOKEN);
-  client.sendMessage({ to: TW_SN, from: TW_PHONE, body: TW_MES },
-    function (err, responseData) {
-      if (!err) {
-        console.log(responseData.from);
-        console.log(responseData.body);
-      }
-      res.send({ err: err, response: TW_MES })
-    });
-})
-
-
-//ADMIN PART
-app.post('/link', function (req, res) {
-
-  debugger
-  var user = {
-    id: uuid.v4(),
-    company: req.body.name,
-    consumerKey: req.body.ck,
-    consumerSecret: req.body.cs,
-    email: req.body.email
-  }
-
-  // Users.create(user).then(function (user) {
-    res.send({ message: `Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id })
-  // })
-});
 
 
 app.listen(port, function () {
