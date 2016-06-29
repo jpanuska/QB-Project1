@@ -44,14 +44,14 @@
             <div class="panel-body">
                 <form class="form" ng-submit="vm.createUser(vm.newUser)">
                     <div class="form-group col-md-12 col-xs-12">
-                        <label for="name">Company Name</label>
-                        <input placeholder="Please provide your company name" type="text" class="form-control" ng-model="vm.newUser.name" required>
+                        <label for="name">Company ID</label>
+                        <input placeholder="Please provide your company ID" type="text" class="form-control" ng-model="vm.newUser.rid" required>
                         <label for="name">Company Consumer Key</label>
                         <input placeholder="Please provide your cunsumer key" type="text" class="form-control" ng-model="vm.newUser.ck" required>
                         <label for="name">Company Consumer Secret</label>
                         <input placeholder="Please provide your consumer secret" type="text" class="form-control" ng-model="vm.newUser.cs" required>
-                        <label for="name">E-mail</label>
-                        <input placeholder="Please provide contact e-mail" type="email" class="form-control" ng-model="vm.newUser.email" required>
+                        <!--<label for="name">E-mail</label>
+                        <input placeholder="Please provide contact e-mail" type="email" class="form-control" ng-model="vm.newUser.em" required>-->
                         <div class="col-md-6 col-md-offset-3 col-xs-12">
                             <button type="submit" class="btn btnqb pull-right" style="width: 100%">CREATE</button>
                         </div>

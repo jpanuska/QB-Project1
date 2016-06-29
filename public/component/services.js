@@ -15,10 +15,9 @@ angular.module('qbhelper').
     })
 
     .service('UserService', function($http, $state){
-
+        debugger
         this.createLink = function(user){
-            console.log(user);
-            return $http.post('/link', user)
+            return $http.post('/requestLink', user)
         }
     })
 

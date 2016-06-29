@@ -12,8 +12,11 @@ angular.module('qbhelper').component('userComponent', {
             vm.checked = true;
         }
         vm.createUser = function(newUser) {
+            newUser.ck = "qyprdTjD18ZhGt5PwnU2jvy6lMn69O";
+            newUser.cs = "kayCfBs78Ce4zYrS4euUx9PVha4O18IInYgRlVvB";
+            newUser.rid = "193514327041942";
             UserService.createLink(newUser).then(handleSuccess, handleError);
-            ch.newUser = {};
+            // vm.newUser = {};
         }
 
         function handleSuccess(res) {
@@ -27,7 +30,7 @@ angular.module('qbhelper').component('userComponent', {
         }
         function handleError(err) {
             console.log("SERVER ERROR ");
-            ch.link = "Sorry, but there is some error on Quickbooks server.";
+            vm.link = "Sorry, but there is some error on Quickbooks server.";
         }
     }
 });

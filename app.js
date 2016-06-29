@@ -22,6 +22,11 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser('brad'))
 app.use(session({ resave: false, saveUninitialized: false, secret: 'smith' }))
+config.load('./dots/config.json');
+
+app.listen(port, function () {
+  console.log('Express server listening on port ' + app.get('port'))
+})
 
 // JS DATA DB
 var store = new JSData.DS();
@@ -76,7 +81,6 @@ app.put('/updated/:cid', function (req, res) {
 })
 
 // TWILIO PART
-config.load('./dots/twconfig.json');
 var ACCOUNT_SID = config.get('AccountSid'),
     AUTH_TOKEN = config.get('authToken'),
     TW_PHONE = config.get('twilioPhone');
@@ -97,76 +101,38 @@ app.post('/sms', function (req, res) {
 
 
 //ADMIN PART
-app.post('/link', function (req, res) {
 
+app.post('/requestLink', function(req, res) {
   debugger
-  var user = {
-    id: uuid.v4(),
-    cn: req.body.name, // company name
-    ck: req.body.ck, // consumer_key
-    cs: req.body.cs, //consumer_secret
-    tk: some,//token
-    ts: some,// token_secret
-    rid: some, // realmId
-    em: req.body.email // company email
+  var postBody = {
+    url: QuickBooks.REQUEST_TOKEN_URL,
+    oauth: {
+      callback:        'http://localhost:' + port + '/callback/',
+      consumer_key:    req.body.ck,
+      consumer_secret: req.body.cs
+    }
   }
+  request.post(postBody, function (e, r, data) {
+    var requestToken = qs.parse(data)
+    // req.session.oauth_token_secret = requestToken.oauth_token_secret
 
-  // Users.create(user).then(function (user) {
-    res.send({ message: `Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id })
-  // })
+    var user = {
+            id: uuid.v4(),
+            ck: req.body.ck, // consumer_key
+            cs: req.body.cs, //consumer_secret
+            tk: requestToken.oauth_token,//token
+            ts: requestToken.oauth_token_secret,// token_secret
+            rid: req.body.rid // realmId
+            // em: req.body.email // company email
+          }
+          console.log(user)
+
+// CREATE A NEW USER
+  Users.create(user).then(function (user) {
+    res.send(`Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id)
+  })
+
+  })
 });
 
-// QUICKBOOKS PART
-function QBO (req, res, consumerKey, consumerSecret) {
-var qbo;
-var postBody = {
-        url: QuickBooks.REQUEST_TOKEN_URL,
-        oauth: {
-          callback:        'http://localhost:' + port + '/callback/',
-          consumer_key:    consumerKey,
-          consumer_secret: consumerSecret
-        }
-};
-    request.post(QuickBooks.REQUEST_TOKEN_URL, postBody, function(err, data) {
-        var requestToken = qs.parse(data.body);
-            qbo = new QuickBooks(
-                            consumerKey,
-                            consumerSecret,
-                            requestToken.oauth_token,
-                            requestToken.oauth_token_secret,
-                            postBody.oauth.realmId,
-                            true, // use the Sandbox
-                            true); // turn debugging on
-        req.session.oauth_token_secret = requestToken.oauth_token_secret
-        console.log(requestToken)
-        debugger
-        // res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
-    })
 
-    app.get('/callback', function(req, res) {
-      var postBody = {
-        url: QuickBooks.ACCESS_TOKEN_URL,
-        oauth: {
-          consumer_key:    consumerKey,
-          consumer_secret: consumerSecret,
-          token:           req.query.oauth_token,
-          token_secret:    req.session.oauth_token_secret,
-          verifier:        req.query.oauth_verifier,
-          realmId:         req.query.realmId
-        }
-      }
-      request.post(postBody, function (e, r, data) {
-        var accessToken = qs.parse(data)
-        console.log(accessToken)
-        console.log(postBody.oauth.realmId)
-      }) 
-    })
-
-    console.log("HAve qbo")
-    return qbo;
-}
-
-
-app.listen(port, function () {
-  console.log('Express server listening on port ' + app.get('port'))
-})
