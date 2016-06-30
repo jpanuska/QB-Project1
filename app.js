@@ -134,12 +134,16 @@ app.post('/sms', function (req, res) {
 
 //   })
 // });
-
-
-
 app.post('/requestLink',function(req,res){
+  debugger
+  res.redirect('/start');
+})
+
+app.get('/start', function(req, res) {
+debugger
   res.render(__dirname+'/public/intuit.ejs', {locals: {port:port, appCenter: QuickBooks.APP_CENTER_BASE}})
 })
+
 
 app.get('/requestToken', function(req, res) {
   var postBody = {

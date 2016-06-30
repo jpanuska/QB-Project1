@@ -7,17 +7,19 @@ angular.module('qbhelper').component('userComponent', {
         vm.checked = false;
         vm.form = false;
 
-        vm.find = function(user) {
+        vm.find = function() {
+            debugger
         // CHECK THE USER
-            vm.checked = true;
+        // vm.checked = true;
+            UserService.createLink().then(handleSuccess, handleError);
         }
-        vm.createUser = function(newUser) {
-            newUser.ck = "qyprdTjD18ZhGt5PwnU2jvy6lMn69O";
-            newUser.cs = "kayCfBs78Ce4zYrS4euUx9PVha4O18IInYgRlVvB";
-            newUser.rid = "193514327041942";
-            UserService.createLink(newUser).then(handleSuccess, handleError);
-            // vm.newUser = {};
-        }
+        // vm.createUser = function(newUser) {
+        //     newUser.ck = "qyprdTjD18ZhGt5PwnU2jvy6lMn69O";
+        //     newUser.cs = "kayCfBs78Ce4zYrS4euUx9PVha4O18IInYgRlVvB";
+        //     newUser.rid = "193514327041942";
+        //     UserService.createLink(newUser).then(handleSuccess, handleError);
+        //     // vm.newUser = {};
+        // }
 
         function handleSuccess(res) {
             if (res.data) {

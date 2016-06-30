@@ -5,23 +5,23 @@
     <div class="jumbotron jumbotron-primary text-center">
          <!--ng-show="vm.checked == false">-->
 
-        <div ng-show="vm.form == false">
+        <!--<div ng-show="vm.form == false">-->
         <h1>Welcome to Customer Updater!</h1>
         <div class="col-md-8 col-md-offset-2">
-        <form ng-submit="vm.find(vm.user)">
+        <form ng-submit="vm.find()">
                 <h3>Please enter your Quickbooks information below: </h3>
-                <div class="input-group-lg col-md-5">
+                <!--<div class="input-group-lg col-md-5">
                     <input placeholder="Your Quickbooks ID" type="text" class="form-control" ng-model="vm.user.qbid" required />
                 </div>
                 <div class="input-group-lg col-md-5">
                     <input placeholder="Your Quickbooks password" type="password" class="form-control" ng-model="vm.user.qbpw" required/>
-                </div>
+                </div>-->
                 <div class="btn-group btn-group-lg">
                     <button class="btn btnqb" type="submit"> Sing in</button>
                 </div>
         </form>
         </div>
-        </div>
+        <!--</div>-->
 
         <!--<div ng-show="vm.form == true">
             <h1>Welcome to Customer Updater!</h1>
