@@ -138,12 +138,6 @@ app.post('/sms', function (req, res) {
 
 
 app.post('/requestLink',function(req,res){
-  res.redirect('/start');
-})
-var consumerKey    = 'qyprdTjD18ZhGt5PwnU2jvy6lMn69O',
-    consumerSecret = 'kayCfBs78Ce4zYrS4euUx9PVha4O18IInYgRlVvB';
-
-app.get('/start', function(req, res) {
   res.render(__dirname+'public/views/intuit.ejs', {locals: {port:port, appCenter: QuickBooks.APP_CENTER_BASE}})
 })
 
@@ -153,7 +147,7 @@ app.get('/requestToken', function(req, res) {
     oauth: {
       callback:        'http://localhost:' + port + '/callback/',
       consumer_key:    consumerKey,
-      consumer_secret: consumerSecret
+      consumer_secret: consumerSecret,
     }
   }
   request.post(postBody, function (e, r, data) {
@@ -173,7 +167,7 @@ app.get('/callback', function(req, res) {
       token:           req.query.oauth_token,
       token_secret:    req.session.oauth_token_secret,
       verifier:        req.query.oauth_verifier,
-      realmId:         req.query.realmId
+      realmId:         realmId
     }
   }
   request.post(postBody, function (e, r, data) {
@@ -181,17 +175,7 @@ app.get('/callback', function(req, res) {
     console.log(accessToken)
     console.log(postBody.oauth.realmId)
 
-    // save the access token somewhere on behalf of the logged in user
-    qbo = new QuickBooks(consumerKey,
-                         consumerSecret,
-                         accessToken.oauth_token,
-                         accessToken.oauth_token_secret,
-                         postBody.oauth.realmId,
-                         true, // use the Sandbox
-                         true); // turn debugging on
-
-    console.log(qbo);
-    
-  })
+    // user.create({auth: postBody.oauth})
+})
 })
 
