@@ -8,7 +8,7 @@ var http       = require('http'),
     session    = require('express-session'),
     express    = require('express'),
     app        = express(),
-    QuickBooks = require('index');
+    QuickBooks = require('./index');
 
 
 // Generic Express config
@@ -33,7 +33,7 @@ app.get('/',function(req,res){
 })
 
 app.get('/start', function(req, res) {
-  res.render(__dirname+'/views/intuit.ejs', {locals: {port:port, appCenter: QuickBooks.APP_CENTER_BASE}})
+  res.render(__dirname+'public/views/intuit.ejs', {locals: {port:port, appCenter: QuickBooks.APP_CENTER_BASE}})
 })
 
 app.get('/requestToken', function(req, res) {

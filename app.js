@@ -1,18 +1,18 @@
 var http = require('http'),
-  express = require('express'),
-  app = express(),
-  port = process.env.PORT || 8080
-  request = require('request'),
-  bodyParser = require('body-parser'),
-  qs = require('querystring'),
-  util = require('util'),
-  cookieParser = require('cookie-parser'),
-  session = require('express-session'),
-  QuickBooks = require('./index'),
-  JSData = require('js-data'),
-  DSNedbAdapter = require('js-data-nedb'),
-  uuid = require('node-uuid'),
-  config = require('config-json');
+    express = require('express'),
+    app = express(),
+    port = process.env.PORT || 8080
+    request = require('request'),
+    bodyParser = require('body-parser'),
+    qs = require('querystring'),
+    util = require('util'),
+    cookieParser = require('cookie-parser'),
+    session = require('express-session'),
+    QuickBooks = require('./index'),
+    JSData = require('js-data'),
+    DSNedbAdapter = require('js-data-nedb'),
+    uuid = require('node-uuid'),
+    config = require('config-json');
 
 // GENERIC EXPRESS CONFIG
 app.use(express.static(__dirname + '/public'))
@@ -102,37 +102,96 @@ app.post('/sms', function (req, res) {
 
 //ADMIN PART
 
-app.post('/requestLink', function(req, res) {
-  debugger
+// app.post('/requestLink', function(req, res) {
+//   debugger
+//   var postBody = {
+//     url: QuickBooks.REQUEST_TOKEN_URL,
+//     oauth: {
+//       callback:        'http://localhost:' + port + '/callback/',
+//       consumer_key:    req.body.ck,
+//       consumer_secret: req.body.cs
+//     }
+//   }
+//   request.post(postBody, function (e, r, data) {
+//     var requestToken = qs.parse(data)
+//     // req.session.oauth_token_secret = requestToken.oauth_token_secret
+
+//     var user = {
+//             id: uuid.v4(),
+//             ck: req.body.ck, // consumer_key
+//             cs: req.body.cs, //consumer_secret
+//             tk: requestToken.oauth_token,//token
+//             ts: requestToken.oauth_token_secret,// token_secret
+//             rid: req.body.rid // realmId
+//             // em: req.body.email // company email
+//           }
+//           console.log(user)
+
+// // CREATE A NEW USER
+//   Users.create(user).then(function (user) {
+//     res.send(`Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id)
+//   })
+
+//   })
+// });
+
+
+
+app.post('/requestLink',function(req,res){
+  res.redirect('/start');
+})
+var consumerKey    = 'qyprdTjD18ZhGt5PwnU2jvy6lMn69O',
+    consumerSecret = 'kayCfBs78Ce4zYrS4euUx9PVha4O18IInYgRlVvB';
+
+app.get('/start', function(req, res) {
+  res.render(__dirname+'public/views/intuit.ejs', {locals: {port:port, appCenter: QuickBooks.APP_CENTER_BASE}})
+})
+
+app.get('/requestToken', function(req, res) {
   var postBody = {
     url: QuickBooks.REQUEST_TOKEN_URL,
     oauth: {
       callback:        'http://localhost:' + port + '/callback/',
-      consumer_key:    req.body.ck,
-      consumer_secret: req.body.cs
+      consumer_key:    consumerKey,
+      consumer_secret: consumerSecret
     }
   }
   request.post(postBody, function (e, r, data) {
     var requestToken = qs.parse(data)
-    // req.session.oauth_token_secret = requestToken.oauth_token_secret
-
-    var user = {
-            id: uuid.v4(),
-            ck: req.body.ck, // consumer_key
-            cs: req.body.cs, //consumer_secret
-            tk: requestToken.oauth_token,//token
-            ts: requestToken.oauth_token_secret,// token_secret
-            rid: req.body.rid // realmId
-            // em: req.body.email // company email
-          }
-          console.log(user)
-
-// CREATE A NEW USER
-  Users.create(user).then(function (user) {
-    res.send(`Successfully created your account. Please direct all of your customers to blah.com/?compId=` + user.id)
+    req.session.oauth_token_secret = requestToken.oauth_token_secret
+    console.log(requestToken)
+    res.redirect(QuickBooks.APP_CENTER_URL + requestToken.oauth_token)
   })
+})
 
+app.get('/callback', function(req, res) {
+  var postBody = {
+    url: QuickBooks.ACCESS_TOKEN_URL,
+    oauth: {
+      consumer_key:    consumerKey,
+      consumer_secret: consumerSecret,
+      token:           req.query.oauth_token,
+      token_secret:    req.session.oauth_token_secret,
+      verifier:        req.query.oauth_verifier,
+      realmId:         req.query.realmId
+    }
+  }
+  request.post(postBody, function (e, r, data) {
+    var accessToken = qs.parse(data)
+    console.log(accessToken)
+    console.log(postBody.oauth.realmId)
+
+    // save the access token somewhere on behalf of the logged in user
+    qbo = new QuickBooks(consumerKey,
+                         consumerSecret,
+                         accessToken.oauth_token,
+                         accessToken.oauth_token_secret,
+                         postBody.oauth.realmId,
+                         true, // use the Sandbox
+                         true); // turn debugging on
+
+    console.log(qbo);
+    
   })
-});
-
+})
 
