@@ -138,7 +138,7 @@ app.post('/sms', function (req, res) {
 
 
 app.post('/requestLink',function(req,res){
-  res.render(__dirname+'public/views/intuit.ejs', {locals: {port:port, appCenter: QuickBooks.APP_CENTER_BASE}})
+  res.render(__dirname+'/public/intuit.ejs', {locals: {port:port, appCenter: QuickBooks.APP_CENTER_BASE}})
 })
 
 app.get('/requestToken', function(req, res) {
